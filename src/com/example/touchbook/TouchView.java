@@ -38,8 +38,6 @@ public class TouchView extends AbsoluteLayout {
 
         paint.setColor(Color.parseColor("#70fff010"));
         canvas.drawRect(0, 409 * 2, 360 * 2, 544 * 2, paint);
-//        canvas.drawRect(0, 480 * 2, 360 * 2, (560) * 2, paint);
-
 
         paint.setColor(Color.parseColor("#70ff0000"));
         canvas.drawRect(152 * 2, 182 * 2, 360 * 2, 323 * 2, paint);

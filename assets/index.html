@@ -48,6 +48,11 @@
             /*padding: 10px;*/
             padding: 4px;
         }
+
+        span {
+            margin: 0px;
+            padding: 0px;
+        }
     </style>
 </head>
 <body>
@@ -115,6 +120,10 @@
     </article>
 </section>
 <script>
+    var pageIndex = 0;
+    var pageCount = 0;
+    var elementCount = 0;
+
     $(document).ready(function () {
         var isMoved;
         var element;
@@ -132,11 +141,6 @@
             }
             if (event.type == 'touchend' && !isMoved) {
                 setTimeout(function () {
-//position = element.offset();
-//alert('>>>>position left:' + position.left +
-//        ', top: ' + position.top +
-//        ', width: ' + element.width()
-//        + ", height: " + element.height());
                     position = element[0].getBoundingClientRect();
                     alert('left, top, right, bottom: ' +
                             position.left + ', '
@@ -146,7 +150,87 @@
                 }, 0);
             }
         });
+
+        setTimeout(function () {
+//            position = $('article')[0].getBoundingClientRect();
+            pageCount = ($('body')[0].scrollWidth + dx) / (360 + dx);
+            elementCount = $('article')[0].childElementCount;
+            setPage();
+        }, 0);
     });
+
+    var dx = 16;
+
+    function nextPage() {
+        if (pageIndex < pageCount - 1) {
+            pageIndex++;
+            setPage();
+        }
+    }
+
+    function beforePage() {
+        if (pageIndex > 0) {
+            pageIndex--;
+            setPage();
+        }
+    }
+
+    function setPage() {
+        $('body').scrollLeft((360 + 16) * pageIndex);//TODO 为什么是16，我是测试出来的准确值
+        setTimeout(function () {
+            var element = document.elementFromPoint(0, 0);
+            var firstIndex = $(element).index();
+            console.log('find first index: ' + firstIndex);
+        }, 10);
+        setTimeout(function () {
+            getLastElement(550);
+        }, 20);
+    }
+
+    var articleElement = $('article').get(0);
+
+    function getLastElement(bottom) {
+        var e = document.elementFromPoint(10, bottom);
+        if (e == articleElement || e.nodeName == 'HTML') {
+            setTimeout(function () {
+                getLastElement(bottom - 20);
+            }, 0);
+        } else {
+//            var rects=e.getClientRects();
+//            var aWord=document.caretRangeFromPoint(355,15);
+//            console.log('find last element, index: ' + $(e).index()+', a word: '+aWord);
+            e.innerHTML = '<span>' + e.innerHTML + '</span>';
+            setTimeout(
+                    function () {
+                        var span = $(e).find('span').get(0);
+//                        console.log('span>>>' + span.innerHTML);
+                        var rects = span.getClientRects();
+                        var lastRect = null;
+                        for (var i = 0; i < rects.length; i++) {
+                            var rect = rects[i];
+                            if (rect.top == 0) {
+                                break;
+                            }
+                            lastRect = rect;
+                            console.log('rect top: ' + rect.top);
+                        }
+                        var x, y;
+                        x = lastRect.right;
+                        y = lastRect.top;
+                        var aWordRange = document.caretRangeFromPoint(x - 20, y + 1);
+                        aWordRange.expand("word");
+
+                        var sel = window.getSelection();
+                        sel.addRange(aWordRange);
+                        var node=sel.anchorNode;
+                        console.log('last word: ' + node.data.substring(aWordRange.startOffset,aWordRange.startOffset+1) + ', right: ' + x + ', bottom: ' + y);
+                        sel.removeAllRanges();
+                    }, 0
+            );
+
+        }
+    }
+
 </script>
 </body>
 </html>

@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.ExpandableListView;
 
 public class MyActivity extends Activity {
     /**
@@ -20,7 +22,7 @@ public class MyActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        WebView webView = new WebView(this);
+        final WebView webView = new WebView(this);
         webView.getSettings().setSupportZoom(false);
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -36,11 +38,28 @@ public class MyActivity extends Activity {
 
         webView.loadUrl("file:///android_asset/index.html");
 
-        ViewGroup rootView=(ViewGroup)findViewById(R.id.rootView);
+        ViewGroup rootView = (ViewGroup) findViewById(R.id.rootView);
         rootView.addView(webView);
 
-        TouchView touchView=new TouchView(this);
+        TouchView touchView = new TouchView(this);
         touchView.setBackgroundColor(Color.TRANSPARENT);
         rootView.addView(touchView);
+
+        View commandView = View.inflate(this, R.layout.command, rootView);
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Button button = (Button) view;
+                if (button.getText().equals("下一页")) {
+                    webView.loadUrl("javascript:nextPage();");
+                } else {
+                    webView.loadUrl("javascript:beforePage();");
+                }
+            }
+        };
+
+        commandView.findViewById(R.id.beforeButton).setOnClickListener(onClickListener);
+        commandView.findViewById(R.id.afterButton).setOnClickListener(onClickListener);
     }
 }
